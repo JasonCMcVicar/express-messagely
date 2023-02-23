@@ -1,9 +1,9 @@
-\echo 'Delete and recreate messagely db?'
+\echo 'Delete and recreate messagely_v2 db?'
 \prompt 'Return for yes or control-C to cancel > ' foo
 
-DROP DATABASE messagely;
-CREATE DATABASE messagely;
-\connect messagely
+DROP DATABASE messagely_v2;
+CREATE DATABASE messagely_v2;
+\connect messagely_v2
 
 
 CREATE TABLE users (
@@ -24,12 +24,12 @@ CREATE TABLE messages (
   read_at TIMESTAMP WITH TIME ZONE);
 
 
-\echo 'Delete and recreate messagely_test db?'
+\echo 'Delete and recreate messagely_v2_test db?'
 \prompt 'Return for yes or control-C to cancel > ' foo
 
-DROP DATABASE messagely_test;
-CREATE DATABASE messagely_test;
-\connect messagely_test
+DROP DATABASE messagely_v2_test;
+CREATE DATABASE messagely_v2_test;
+\connect messagely_v2_test
 
 CREATE TABLE users (
   username TEXT PRIMARY KEY,
@@ -47,4 +47,3 @@ CREATE TABLE messages (
   body TEXT NOT NULL,
   sent_at TIMESTAMP WITH TIME ZONE NOT NULL,
   read_at TIMESTAMP WITH TIME ZONE);
-
