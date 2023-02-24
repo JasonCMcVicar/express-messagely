@@ -3,6 +3,7 @@
 const db = require("../db");
 const bcrypt = require("bcrypt");
 const { BCRYPT_WORK_FACTOR } = require("../config");
+const { NotFoundError } = require("../expressError");
 
 /** User of the site. */
 
@@ -47,13 +48,31 @@ class User {
         return true;
       }
     }
-    
+
     return false;
   }
 
   /** Update last_login_at for user */
 
+  // do a query for username
+  // do sql insertion for last_login_at
+
   static async updateLoginTimestamp(username) {
+
+    const result = await db.query(
+      `UPDATE users
+       SET last_login_at = current_timestamp
+        WHERE username = $1
+        RETURNING username, last_login_at`,
+      [username]
+    );
+    const user = result.rows[0];
+
+    if (!user) {
+      throw new NotFoundError(`No such user: ${username}`);
+    }
+
+    return user;
   }
 
   /** All: basic info on all users:
