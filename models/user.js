@@ -129,6 +129,42 @@ class User {
    */
 
   static async messagesFrom(username) {
+    const result = await db.query(
+      `SELECT m.id,
+              m.to_username,
+              u.first_name,
+              u.last_name,
+              u.phone,
+              m.body,
+              m.sent_at,
+              m.read_at
+        FROM users AS u
+              JOIN messages AS m ON u.username = m.from_username
+        WHERE u.username = $1`,
+      [username]
+    );
+
+    let messages = result.rows;
+
+    if (!messages) throw new NotFoundError(`No such message from user: ${username}`);
+
+    for (let m of messages) {
+      m = {
+       id: m.id,
+       body: m.body,
+       sent_at: m.sent_at,
+       read_at: m.read_at,
+       to_user: {
+        username: m.to_username,
+        first_name: m.first_name,
+        last_name: m.last_name,
+        phone: m.phone
+       },
+      }
+    }
+    console.log(messages);
+
+    return messages;
   }
 
   /** Return messages to this user.
