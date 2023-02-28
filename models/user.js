@@ -132,14 +132,15 @@ class User {
     const result = await db.query(
       `SELECT m.id,
               m.to_username,
-              u.first_name,
-              u.last_name,
-              u.phone,
+              t.first_name,
+              t.last_name,
+              t.phone,
               m.body,
               m.sent_at,
               m.read_at
         FROM users AS u
               JOIN messages AS m ON u.username = m.from_username
+              JOIN users AS t ON m.to_username = t.username
         WHERE u.username = $1`,
       [username]
     );
@@ -148,21 +149,20 @@ class User {
 
     if (!messages) throw new NotFoundError(`No such message from user: ${username}`);
 
-    for (let m of messages) {
-      m = {
-       id: m.id,
-       body: m.body,
-       sent_at: m.sent_at,
-       read_at: m.read_at,
+    for (let i = 0; i < messages.length; i++) {
+      messages[i] = {
+       id: messages[i].id,
+       body: messages[i].body,
+       sent_at: messages[i].sent_at,
+       read_at: messages[i].read_at,
        to_user: {
-        username: m.to_username,
-        first_name: m.first_name,
-        last_name: m.last_name,
-        phone: m.phone
+        username: messages[i].to_username,
+        first_name: messages[i].first_name,
+        last_name: messages[i].last_name,
+        phone: messages[i].phone
        },
       }
     }
-    console.log(messages);
 
     return messages;
   }
