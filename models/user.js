@@ -172,13 +172,13 @@ class User {
    * [{id, from_user, body, sent_at, read_at}]
    *
    * where from_user is
-   *   {id, first_name, last_name, phone}
+   *   {username, first_name, last_name, phone}
    */
 
   static async messagesTo(username) {
     const result = await db.query(
       `SELECT m.id,
-              m.to_username,
+              m.from_username,
               f.first_name,
               f.last_name,
               f.phone,
@@ -187,11 +187,13 @@ class User {
               m.read_at
         FROM users AS u
               JOIN messages AS m ON u.username = m.to_username
-              JOIN users AS f ON m.to_username = f.username
+              JOIN users AS f ON m.from_username = f.username
         WHERE u.username = $1`,
       [username]
     );
     let messages = result.rows;
+
+    console.log("Messages = ", messages);
 
     if (!messages) throw new NotFoundError(`No such message from user: ${username}`);
 
@@ -202,7 +204,7 @@ class User {
        sent_at: messages[i].sent_at,
        read_at: messages[i].read_at,
        from_user: {
-        username: messages[i].to_username,
+        username: messages[i].from_username,
         first_name: messages[i].first_name,
         last_name: messages[i].last_name,
         phone: messages[i].phone
