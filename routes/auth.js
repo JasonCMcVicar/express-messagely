@@ -15,26 +15,12 @@ router.post("/login", async function (req, res, next) {
     console.log("result=", result);
 
     if (result) {
-        const token = jwt.sign(username, SECRET_KEY);
-        console.log("token.iat=", token.iat);
+        const token = jwt.sign({ username },SECRET_KEY);
 
-        const tokenRes = jwt.verify(token, SECRET_KEY);
-
-        console.log(tokenRes);
-        
         return res.json({ token });
     }
     throw new UnauthorizedError("Invalid username/password");
 });
-
-// receive a request from a user
-    // params: username, password
-// look at request object
-// access request parameters
-// pass parameters to User model with authenticate method
-// if fails, throw an error
-// if successful authentication (receives true), create a token using JWT
-// return response object as a json token
 
 
 /** POST /register: registers, logs in, and returns token.
