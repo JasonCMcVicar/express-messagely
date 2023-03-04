@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const { SECRET_KEY } = require("../config");
 const User  = require("../models/user");
-const { UnauthorizedError } = require("../expressError");
+const { UnauthorizedError, BadRequestError } = require("../expressError");
 
 /** POST /login: {username, password} => {token} */
 router.post("/login", async function (req, res, next) {
@@ -27,5 +27,24 @@ router.post("/login", async function (req, res, next) {
  *
  * {username, password, first_name, last_name, phone} => {token}.
  */
+router.post("/register", async function (req, res, next) {
+
+  // call register method to place username, psw, fname, lname, ph in db
+  // get back a result, use that username to create token
+
+  const userdata = req.body;
+  console.log("user info: ", userdata);
+  const result = await User.register(userdata);
+
+  console.log("the result is: ", result);
+
+  if (result) {
+    let payload = {username: result.username}
+    const token = jwt.sign(payload, SECRET_KEY);
+    return res.json({ token });
+  }
+  throw new BadRequestError("Invalid attempt at account creation");
+
+});
 
 module.exports = router;
