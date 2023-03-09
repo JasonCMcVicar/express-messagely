@@ -147,6 +147,7 @@ class User {
 
     let messages = result.rows;
 
+    // This will never throw an error because an empty array is truthy.
     if (!messages) throw new NotFoundError(`No such message from user: ${username}`);
 
     for (let i = 0; i < messages.length; i++) {
