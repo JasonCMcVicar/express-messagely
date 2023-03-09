@@ -193,7 +193,7 @@ class User {
     );
     let messages = result.rows;
 
-    if (!messages) throw new NotFoundError(`No such message from user: ${username}`);
+    if (!messages) throw new NotFoundError(`No such message to user: ${username}`);
 
     for (let i = 0; i < messages.length; i++) {
       messages[i] = {
