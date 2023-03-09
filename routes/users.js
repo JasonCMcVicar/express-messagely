@@ -61,11 +61,7 @@ router.get("/:username/to", ensureCorrectUser, async function(req, res, next) {
         return res.json({messages: result});
     }
 
-})
-
-
-
-
+});
 
 
 /** GET /:username/from - get messages from user
@@ -77,5 +73,16 @@ router.get("/:username/to", ensureCorrectUser, async function(req, res, next) {
  *                 to_user: {username, first_name, last_name, phone}}, ...]}
  *
  **/
+router.get("/:username/from", ensureCorrectUser, async function(req, res, next) {
+    const { username } = req.params;
+
+    try {
+        // TODO: how to handle no messages (receiving an empty array)?
+        const result = await User.messagesFrom(username);
+        return res.json({messages: result});
+    } catch(err) {
+        return next(err);
+    }
+});
 
 module.exports = router;
