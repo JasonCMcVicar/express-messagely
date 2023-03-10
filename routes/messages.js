@@ -6,7 +6,8 @@ const router = new Router();
 const { ensureLoggedIn, ensureCorrectUser } = require("../middleware/auth.js");
 const User  = require("../models/user");
 const Message = require("../models/message");
-const { NotFoundError } = require("../expressError");
+const { NotFoundError, UnauthorizedError } = require("../expressError");
+const db = require("../db.js");
 
 
 /** GET /:id - get detail of message.
@@ -21,6 +22,19 @@ const { NotFoundError } = require("../expressError");
  * Makes sure that the currently-logged-in users is either the to or from user.
  *
  **/
+router.get("/:id", ensureLoggedIn, async function (req, res, next) {
+  const { id } = req.params;
+
+  const result = await Message.get(id);
+
+  if (res.locals.user.username === result.to_user.username ||
+     res.locals.user.username === result.from_user.username) {
+      return res.json({message: result})
+  } else {
+      throw new UnauthorizedError();
+  }
+
+});
 
 
 /** POST / - post message.
