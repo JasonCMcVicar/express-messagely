@@ -70,6 +70,25 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * Makes sure that the only the intended recipient can mark as read.
  *
  **/
+// ensureLoggedIn middleware
+// get message by ID using req.params.id
+// check that message result .toUser equals the logged in username in token
+// use markRead to update and obtain message data
+// return successful result OR throw error
+router.post("/:id/read", ensureLoggedIn, async function (req, res, next) {
+  try {
+    const { id } = req.params;
+    const messageResult = await Message.get(id);
 
+    if (res.locals.user.username !== messageResult.to_user.username) {
+      throw new UnauthorizedError();
+    } else {
+      const result = await Message.markRead(id);
+      return res.json({message: result});
+    }
+  } catch (err) {
+    return next(err);
+  }
+});
 
 module.exports = router;
