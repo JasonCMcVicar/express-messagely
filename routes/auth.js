@@ -12,7 +12,6 @@ const { UnauthorizedError, BadRequestError } = require("../expressError");
 router.post("/login", async function (req, res, next) {
     const { username, password } = req.body;
     const result = await User.authenticate(username, password);
-    console.log("result=", result);
 
     if (result) {
         const token = jwt.sign({ username },SECRET_KEY);
@@ -33,10 +32,7 @@ router.post("/register", async function (req, res, next) {
   // get back a result, use that username to create token
 
   const userdata = req.body;
-  console.log("user info: ", userdata);
   const result = await User.register(userdata);
-
-  console.log("the result is: ", result);
 
   if (result) {
     let payload = {username: result.username}
