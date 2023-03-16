@@ -80,8 +80,6 @@ describe("Users Routes Test", function () {
       let response = await request(app)
         .get(`/users/${u1.username}`)
         .query({ _token: testUserToken });
-        
-      // FIXME: when is updateLoginTimestamp used in routes?
 
       expect(response.statusCode).toEqual(200);
       expect(response.body).toEqual({
