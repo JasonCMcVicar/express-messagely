@@ -56,6 +56,20 @@ describe("Users Routes Test", function () {
           }]
       });
     });
+    test("test will error with no token", async function () {
+      let response = await request (app)
+        .get("/users/")
+        .query();
+
+      expect(response.statusCode).toEqual(401);
+    });
+    test("test will error with a bad token", async function () {
+      let response = await request (app)
+        .get("/users/")
+        .query({ _token: "crash"});
+
+      expect(response.statusCode).toEqual(401);
+    });
   });
 
 
