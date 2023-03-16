@@ -7,12 +7,15 @@ const app = require("../app");
 const db = require("../db");
 const User = require("../models/user");
 const { SECRET_KEY } = require("../config.js");
+const Message = require("../models/message");
 
 describe("Users Routes Test", function () {
 
   let testUserToken;
   let u1;
   let u2;
+  let m1;
+  let m2;
 
   beforeEach(async function () {
     await db.query("DELETE FROM messages");
@@ -33,6 +36,19 @@ describe("Users Routes Test", function () {
       last_name: "Testy2",
       phone: "+14155550001",
     });
+
+    m1 = await Message.create({
+      from_username: "test2",
+      to_username: "test1",
+      body: "hi",
+    });
+
+    m2 = await Message.create({
+      from_username: "test1",
+      to_username: "test2",
+      body: "hello",
+    });
+
 
     const testUser1 = { username: "test1" };
     testUserToken = jwt.sign(testUser1, SECRET_KEY);
@@ -107,6 +123,31 @@ describe("Users Routes Test", function () {
         .get(`/users/${u2.username}`);
 
       expect(response.statusCode).toEqual(401);
+    });
+  });
+
+  describe("GET /users/:username/to", function () {
+    test("can get a list of all messages sent to a user", async function () {
+      m1 = await Message.get(m1.id);
+      let response = await request(app)
+        .get(`/users/${u1.username}/to`)
+        .query({ _token: testUserToken });
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({
+        messages: [{
+          id: m1.id,
+          body: "hi",
+          sent_at: expect.any(String),
+          read_at: m1.read_at,
+          from_user: {
+            username: "test2",
+            first_name: "Test2",
+            last_name: "Testy2",
+            phone: "+14155550001"
+          }
+        }]
+      });
     });
   });
 
