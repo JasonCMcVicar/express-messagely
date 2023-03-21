@@ -12,6 +12,7 @@ const Message = require("../models/message");
 describe("Users Routes Test", function () {
 
   let testUserToken;
+  let testUserToken2;
   let u1;
   let u2;
   let m1;
@@ -43,15 +44,17 @@ describe("Users Routes Test", function () {
       body: "hi",
     });
 
-    m2 = await Message.create({
-      from_username: "test1",
-      to_username: "test2",
-      body: "hello",
-    });
+    // m2 = await Message.create({
+    //   from_username: "test1",
+    //   to_username: "test2",
+    //   body: "hello",
+    // });
 
 
     const testUser1 = { username: "test1" };
+    const testUser2 = { username: "test2" };
     testUserToken = jwt.sign(testUser1, SECRET_KEY);
+    testUserToken2 = jwt.sign(testUser2, SECRET_KEY);
 
   });
 
@@ -148,6 +151,30 @@ describe("Users Routes Test", function () {
           }
         }]
       });
+    });
+    test("test returns empty array when no messages exist", async function () {
+      let response = await request(app)
+        .get(`/users/${u2.username}/to`)
+        .query({ _token: testUserToken2 });
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({
+        messages: []
+      });
+    });
+    test("test errors when bad token is provided for user", async function () {
+      let response = await request(app)
+        .get(`/users/${u2.username}/to`)
+        .query({ _token: '' });
+
+      expect(response.statusCode).toEqual(401);
+    });
+    test("test errors when no token is provided for user", async function () {
+      let response = await request(app)
+        .get(`/users/${u2.username}/to`)
+        .query( );
+
+      expect(response.statusCode).toEqual(401);
     });
   });
 
