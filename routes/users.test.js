@@ -96,6 +96,8 @@ describe("Users Routes Test", function () {
 
   describe("GET /users/:username", function () {
     test("can get a user's details with correct token", async function () {
+      u1 = await User.get(u1.username);
+
       let response = await request(app)
         .get(`/users/${u1.username}`)
         .query({ _token: testUserToken });
