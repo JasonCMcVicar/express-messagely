@@ -9,7 +9,7 @@ const User = require("../models/user");
 const { SECRET_KEY } = require("../config.js");
 const Message = require("../models/message");
 
-describe("Users Routes Test", function () {
+describe("Messages Routes Test", function () {
 
   let testUserToken;
   let testUserToken2;
@@ -140,7 +140,64 @@ describe("Users Routes Test", function () {
     });
   });
 
+  describe("POST /messages/", function () {
+    test("can send a new message to an existing user", async function () {
+      let response = await request(app)
+        .post("/messages/")
+        .query({ _token: testUserToken })
+        .send({
+          to_username: u2.username,
+          body: "hello"
+        });
 
+      expect(response.statusCode).toEqual(201);
+      expect(response.body).toEqual({
+        message: {
+          id: expect.any(Number),
+          from_username: "test1",
+          to_username: "test2",
+          body: "hello",
+          sent_at: expect.any(String)
+        }
+      });
+    });
+
+    test("will throw an error if to_username doesn't exist", async function () {
+      let response = await request(app)
+        .post("/messages/")
+        .query({ _token: testUserToken })
+        .send({
+          to_username: "invalid",
+          body: "hello"
+        });
+
+      expect(response.statusCode).toEqual(404);
+    });
+
+    test("will throw an error if invalid token", async function () {
+      let response = await request(app)
+        .post("/messages/")
+        .query({ _token: "invalid" })
+        .send({
+          to_username: u2.username,
+          body: "hello"
+        });
+
+      expect(response.statusCode).toEqual(401);
+    });
+
+    test("will throw an error without a token", async function () {
+      let response = await request(app)
+        .post("/messages/")
+        .query()
+        .send({
+          to_username: u2.username,
+          body: "hello"
+        });
+
+      expect(response.statusCode).toEqual(401);
+    });
+  });
 });
 
 afterAll(async function () {
