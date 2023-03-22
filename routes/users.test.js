@@ -180,7 +180,58 @@ describe("Users Routes Test", function () {
     });
   });
 
+  describe("GET /users/:username/from", function () {
+    test("can get a list of all messages sent from a user", async function () {
+      m1 = await Message.get(m1.id);
 
+      let response = await request(app)
+        .get(`/users/${u2.username}/from`)
+        .query({ _token: testUserToken2 });
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({
+        messages: [{
+          id: m1.id,
+          body: "hi",
+          sent_at: expect.any(String),
+          read_at: m1.read_at,
+          to_user: {
+            username: "test1",
+            first_name: "Test1",
+            last_name: "Testy1",
+            phone: "+14155550000"
+          }
+        }]
+      });
+    });
+
+    test("returns empty array when no messages exist", async function () {
+      let response = await request(app)
+        .get(`/users/${u1.username}/from`)
+        .query({ _token: testUserToken });
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({
+        messages: []
+      });
+    });
+
+    test("errors when bad token is provided for user", async function () {
+      let response = await request(app)
+        .get(`/users/${u2.username}/from`)
+        .query({ _token: '' });
+
+      expect(response.statusCode).toEqual(401);
+    });
+
+    test("errors when no token is provided for user", async function () {
+      let response = await request(app)
+        .get(`/users/${u2.username}/from`)
+        .query();
+
+      expect(response.statusCode).toEqual(401);
+    });
+  });
 });
 
 afterAll(async function () {
