@@ -198,6 +198,52 @@ describe("Messages Routes Test", function () {
       expect(response.statusCode).toEqual(401);
     });
   });
+
+  describe("POST /messages/:id/read", function () {
+    test("message recipient (to_user) can mark a message as read", async function () {
+      let response = await request(app)
+        .post(`/messages/${m1.id}/read`)
+        .query({ _token: testUserToken });
+
+      expect(response.statusCode).toEqual(200);
+      expect(response.body).toEqual({
+        message: {
+          id: expect.any(Number),
+          read_at: expect.any(String),
+        }
+      });
+    });
+
+    test("message sender (from_user) can NOT mark a message as read", async function () {
+      let response = await request(app)
+        .post(`/messages/${m1.id}/read`)
+        .query({ _token: testUserToken2 });
+
+      expect(response.statusCode).toEqual(401);
+    });
+
+    test("error if message recipient isn't logged in", async function () {
+      let response = await request(app)
+        .post(`/messages/${m1.id}/read`)
+        .query();
+
+      expect(response.statusCode).toEqual(401);
+    });
+
+    test("error if message id isn't valid", async function () {
+      let response = await request(app)
+        .post("/messages/75/read")
+        .query({ _token: testUserToken });
+
+      expect(response.statusCode).toEqual(404);
+    });
+
+  });
+
+
+
+
+
 });
 
 afterAll(async function () {
